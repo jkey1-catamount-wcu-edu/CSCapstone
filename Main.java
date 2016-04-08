@@ -73,6 +73,8 @@ public class Main extends Application {
         window.setTitle("Mandelbrot Sets!");
         window.setScene(scene);
         window.show();
+
+
     }
 
 
@@ -111,7 +113,7 @@ public class Main extends Application {
         double c_real;
 
         // The total number of iterations we allow the program to run through. Increasing this allows more detail.
-        int maxIterations = 6;
+        int maxIterations = 100;
 
         // This is the actual x starting value. Usually begins at 0 unless stated otherwise
         double functionZRealNumber;
@@ -129,7 +131,11 @@ public class Main extends Application {
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
 
         // The Graphics context object used in order to edit the canvas
-        GraphicsContext gc = new GraphicsContext();
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        //Image image = new Image();
+
+
 
 
         System.out.println("Beginning");
@@ -159,20 +165,28 @@ public class Main extends Application {
                     //while(isIterations) {
                         if ((functionZRealSquared + functionZImaginarySquared) > 4) {
                             isInside = false;
-                            isIterations = false;
+                            //isIterations = false;
+                            gc.fillOval(functionZRealNumber, functionZImaginary, 1, 1);
+                            gc.setFill(Color.RED);
+                            System.out.println("Colored Node Red");
+
                      //   }
-                    }
+                    } else {
+                            gc.fillOval(functionZRealSquared, functionZImaginary, 1, 1);
+                            gc.setFill(Color.BLACK);
+                            System.out.println("colored node black");
+
+                        }
+                    maxIterations++;
+
                     functionZImaginary  = 2 *functionZRealNumber*functionZImaginary + c_imaginary;
                     functionZRealNumber = functionZRealSquared - functionZImaginarySquared + c_real;
 
-                    System.out.println(functionZRealNumber);
-                    System.out.println(functionZImaginary);
+                    System.out.println(functionZRealSquared);
+                    System.out.println(functionZImaginarySquared);
                 }
             }
-            if(isInside) {
-                // this is where we place a pixel
-                // this is also where we would COLOR the pixel
-            }
+
         }
         launch(args);
 
