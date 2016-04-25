@@ -1,38 +1,206 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.stage.Stage;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import java.lang.Math;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
-import javafx.scene.image.WritableImage;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-
+import javafx.stage.Stage;
+import javafx.scene.layout.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.MenuBar;
 
 public class Main extends Application {
 
-    Stage window;
+    /**
+     *  The Stage is created. The Stage allows us to add javafx features to the program.
+     */
+        //Stage window;
+
+    /**
+     *  Creating the BorderPane Layout for the javafx program.
+     */
+        BorderPane bLayout;
+
+    /**
+     * The Scene node allows us to add things to the stage.
+     */
+        Scene scene;
+
+    /**
+     *  The Height of the initial screen size.
+     */
+        private int sceneHeight = 800;
+
+    /**
+     *  The width of the inital screen size.
+     */
+
+        private int sceneWidth = 500;
+
+    /**
+     *  This is the minimum value that the x coordinates or real numbers can be when testing convergence.
+     */
+
+        private double minimumRealNumber = -2.0;
+
+     /**
+      * This is the maimum value that the x coordinate or real numbers can be when testing convergence
+      */
+        private double maximumRealNumber = 1.0;
+
+    /**
+     *  This is the minimum value that our imaginary or y values can contain when testing for convergence
+     */
+        private double minimumImaginaryNumber = -1.2;
+
+    /**
+     * The max value the imaginary value can be.
+     */
+        private double maximumImaginaryNumber;
+
+    /**
+     *  The value that enables the x value to fit on the screen.
+     */
+        private double realNumberFactor;
+
+    /**
+     *  The value that enables the y value to fit on the screen.
+     */
+        private double imaginaryNumberFactor;
+
+    /**
+     *  The actual imaginary number from the complex number.
+     */
+        private double c_imaginary;
+
+    /**
+     *  The actual real number from the complex number.
+     */
+        private double c_real;
+
+    /**
+     *  The total number of iterations we allow the program to run through. Increasing this allows more detail.
+     */
+        private int maxIterations = 100;
+
+    /**
+     *  This is the actual x starting value. Usually begins at 0 unless stated otherwise.
+     */
+        private double functionZRealNumber;
+
+    /**
+     *  This is the actual y starting value. usually begins at 0 unless stated otherwise.
+     */
+        private double functionZImaginary;
+
+    /**
+     *  Our boolean value for convergence. If we are inside we color the point black, if not we color it some other
+     *  color.
+     */
+        private boolean isInside = false;
+
+    /**
+     *  Number for convergence. If the c value goes past this then we know it escapes the set.
+     */
+        private static final int FOUR = 4;
+
+    /**
+     * The WritableImage object to enable writing to an image.
+     */
+        WritableImage wr;
+
+    /**
+     *  The Pixelwriter onject which allows the manipulation of pixels.
+     */
+        PixelWriter pr;
+
+    /**
+     * The Image object. We will put the WritableImage onject into the Image object so we can use ImageView to display
+     * the custom image.
+     */
+        Image image;
+
+    /**
+     *  The ImageView object. This object is what will ACTUALLY allow us to see the Mandelbrot set image.
+     */
+        ImageView view;
+
+    /**
+     *  The Color object. This allows us to have color for the Mandelbrot set of black.
+     */
+        Color black      = Color.BLACK;
+
+    /**
+     *  The Color object. This allows us to have color for the Mandelbrot set of black.
+     */
+        Color red      = Color.RED;
+
+    /**
+     *  The Color object. This allows us to have color for the Mandelbrot set of green.
+     */
+        Color green      = Color.GREEN;
+
+    /**
+     *  The Color object. This allows us to have color for the Mandelbrot set of teal.
+     */
+        Color teal      = Color.TEAL;
+
+    /**
+     *  The Color object. This allows us to have color for the Mandelbrot set of turqoise.
+     */
+        Color turquoise      = Color.TURQUOISE;
 
 
-
-
-    //Equation draw = new Equation();
-    //draw.createMandelbrot();
-    //draw.
-
+    /**
+     * The start method is required in javafx. This method acts like a normal main() in Java programming.
+     * This method is where are javafx features should be initialized and used accordingly.
+     * @param primaryStage - The main stage that works inside start().
+     * @throws Exception - Allows for any type of exception to be thrown.
+     */
     @Override
     public void start(Stage primaryStage) throws Exception{
-        window = primaryStage;
+
+        // Initializing the variables
+        //window = primaryStage;
+        bLayout = new BorderPane();
+        createMenu();
+        calculations2();
+
+        bLayout.setCenter(view);
+
+        scene = new Scene(bLayout, 2000, 2000);
+
+        // Sets the title of the program.
+        primaryStage.setTitle("Mandelbrot Sets!");
+
+
+
+
+        // Sets the scene to the Stage. Everything attached the the scene goes onto the Stage.
+        primaryStage.setScene(scene);
+
+
+
+        // This is how Javafx 'shows' everything attached to the program. This is what actually puts every
+        // feature onto the program.
+        primaryStage.show();
+    }
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+
+
+    public void createMenu() {
+
+
 
         // Making the equation, recent, zoom, and picture menus
         Menu equationMenu = new Menu("Equation");
@@ -63,77 +231,24 @@ public class Main extends Application {
         menubar.getMenus().addAll(zoomMenu);
         menubar.getMenus().addAll(pictureMenu);
 
-        // Creating the borderlayout to add the menu to the top of the screen
-        BorderPane bLayout = new BorderPane();
+        // Setting the MenuBar to the Top portion of the BorderPane.
         bLayout.setTop(menubar);
-
-        // Creating the scene and adding it to the show
-        Scene scene = new Scene(bLayout, 400, 300);
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        window.setTitle("Mandelbrot Sets!");
-        window.setScene(scene);
-        window.show();
-
 
     }
 
-
-    public static void main(String[] args) {
-
-        // The height of the initial screen size
-        int canvasHeight = 300;
-
-        // The width of the inital screen size
-        int canvasWidth = 500;
-
-        // this is the minimum value that the x coordinates or real numbers can be when testing convergence
-        double minimumRealNumber = -2.0;
-
-        // this is the maimum value that the x coordinate or real numbers can be when testing convergence
-        double maximumRealNumber = 1.0;
-
-        // This is the minimum value that our imaginary or y values can contain when testing for convergence
-        double minimumImaginaryNumber = -1.2;
+    public void calculations() {
+        addPixelsToScreen();
 
         // in order to display the contents of an imaginary number, we have to multiply the min number and the difference
         // of the min and max together by the screen size
-        double maximumImaginaryNumber = minimumImaginaryNumber + (maximumRealNumber - minimumRealNumber) *
-                (canvasHeight / canvasWidth);
+        maximumImaginaryNumber = minimumImaginaryNumber + (maximumRealNumber - minimumRealNumber) *
+                (sceneHeight / sceneWidth);
 
-        // the value that enables the x value to fit on the screen
-        double realNumberFactor = (maximumRealNumber - minimumRealNumber) / (canvasWidth - 1);
 
-        // the value that enables the y value to fit on the screen
-        double imaginaryNumberFactor = (maximumImaginaryNumber - minimumImaginaryNumber) / (canvasHeight - 1);
+        realNumberFactor = (maximumRealNumber - minimumRealNumber) / (sceneWidth - 1);
 
-        // The actual imaginary number from the complex number
-        double c_imaginary;
 
-        // The actual real number from the complex number
-        double c_real;
-
-        // The total number of iterations we allow the program to run through. Increasing this allows more detail.
-        int maxIterations = 100;
-
-        // This is the actual x starting value. Usually begins at 0 unless stated otherwise
-        double functionZRealNumber;
-
-        // This is the actual y starting value. usually begins at 0 unless stated otherwise
-        double functionZImaginary;
-
-        // Our boolean value for convergence. If we are inside we color the point black, if not we color it some other
-        // color.
-        boolean isInside = false;
-
-        boolean isIterations = true;
-
-        // The canvas to draw and add to the center borderpane.
-        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
-
-        // The Graphics context object used in order to edit the canvas
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        //Image image = new Image();
+        imaginaryNumberFactor = (maximumImaginaryNumber - minimumImaginaryNumber) / (sceneHeight - 1);
 
 
 
@@ -141,11 +256,11 @@ public class Main extends Application {
         System.out.println("Beginning");
         System.out.flush();
 
-        for (int y = 0; y < canvasHeight; y++) {
+        for (int y = 0; y < sceneHeight; y++) {
 
             c_imaginary = maximumImaginaryNumber - (y * imaginaryNumberFactor);
 
-            for (int x = 0; x < canvasWidth; x++) {
+            for (int x = 0; x < sceneWidth; x++) {
                 c_real = minimumRealNumber + (x * realNumberFactor);
                 functionZRealNumber = c_real;
                 functionZImaginary  = c_imaginary;
@@ -162,25 +277,24 @@ public class Main extends Application {
                     System.out.println(functionZImaginarySquared);
                     System.out.flush();
 
-                    //while(isIterations) {
-                        if ((functionZRealSquared + functionZImaginarySquared) > 4) {
-                            isInside = false;
-                            //isIterations = false;
-                            gc.fillOval(functionZRealNumber, functionZImaginary, 1, 1);
-                            gc.setFill(Color.RED);
-                            System.out.println("Colored Node Red");
 
-                     //   }
+                    if ((functionZRealSquared + functionZImaginarySquared) > FOUR) {
+                        isInside = false;
+                        //isIterations = false;
+                        //pr.setColor(functionZImaginary, functionZRealNumber, red);
+                        System.out.println("Colored Node Red");
+
+
                     } else {
-                            gc.fillOval(functionZRealSquared, functionZImaginary, 1, 1);
-                            gc.setFill(Color.BLACK);
-                            System.out.println("colored node black");
+                        //pr.setColor(functionZImaginary, functionZRealNumber, black);
+                        System.out.println("colored node black");
 
-                        }
-                    maxIterations++;
+                    }
+                    ;
 
                     functionZImaginary  = 2 *functionZRealNumber*functionZImaginary + c_imaginary;
                     functionZRealNumber = functionZRealSquared - functionZImaginarySquared + c_real;
+                    //maxIterations++;
 
                     System.out.println(functionZRealSquared);
                     System.out.println(functionZImaginarySquared);
@@ -188,9 +302,98 @@ public class Main extends Application {
             }
 
         }
-        launch(args);
+    }
+
+    public void addPixelsToScreen() {
+        wr = new WritableImage(sceneWidth / 2, sceneHeight / 2);
+        pr = wr.getPixelWriter();
+        image = wr;
+        view = new ImageView(image);
+
+
 
     }
 
+    public void brainstorm() {
+        addPixelsToScreen();
+
+
+        int oldX = 0;
+        int oldY = 0;
+
+        int newX = 0;
+        int newY = 0;
+
+        int iteratedRealNumber = 1;
+        int iteratedImaginaryNumber = 1;
+
+
+        int iterations = 100;
+
+
+
+        for(int i = 0; i < iterations; i++) {
+            newX = (oldX*oldX) - (oldY*oldY);
+            newX+= iteratedRealNumber;
+
+            newY = (2*oldX*oldY);
+            newY+= iteratedImaginaryNumber;
+
+            if(newX*newX + oldY*oldY > FOUR) {
+                pr.setColor(newX, newY, red);
+                System.out.println("X = " + newX);
+                System.out.println("Y = " + newY);
+                System.out.println("Colored RED");
+
+
+            } else {
+                pr.setColor(newX, newY, black);
+                System.out.println("X = " + newX);
+                System.out.println("Y = " + newY);
+                System.out.println("Colored BLACK");
+
+            }
+
+            oldX = newX;
+            oldY = newY;
+        }
+
+
+
+    }
+
+    public void calculations2() {
+        addPixelsToScreen();
+        int width = 1920, height = 1080, max = 1000;
+        //BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        //int black = 0x000000, white = 0xFFFFF1;
+
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                double c_re = (col - width / 2) * 4.0 / width;
+                double c_im = (row - height / 2) * 4.0 / width;
+                double x = 0, y = 0;
+                int iterations = 0;
+                while (x * x + y * y < 4 && iterations < max) {
+                    double x_new = x * x - y * y + c_re;
+                    y = 2 * x * y + c_im;
+                    x = x_new;
+                    iterations++;
+                }
+                if (iterations < max) {
+
+                    pr.setColor(col, row, red);
+
+                    System.out.println("Colored RED");
+                } else {
+                    pr.setColor(col, row, black);
+                }
+            }
+
+        }
+
+        bLayout.setCenter(view);
+        //ImageIO.write(image, "png", new File("mandelbrot.png"));
+    }
 
 }
